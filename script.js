@@ -1,96 +1,83 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector(".slideshow_container");
-  const slides = document.querySelectorAll(".main_div");
-  let startY = 0;
-  let currentY = 0;
-  let isDDragging = false;
-  let translateY = 0;
-  const slideHeight = slides[0].offsetHeight;
+const container = document.getElementById("container");
 
-  container.addEventListener("mousedown", (event) => {
-    isDDragging = true;
-    startY = event.clientY;
-    container.classList.add("dragging");
-  });
+const allChilds = Array.from(container.children);
 
-  container.addEventListener("mousemove", (event) => {
-    if (!isDDragging) return;
+// let startPosition = 0;
+const offset = 300;
+// let index = 0;
+let currIndex = 0;
 
-    currentY = event.clientY;
-    const change = currentY - startY;
-    translateY += change;
-
-    const currentIndex = getCurrentSlideIndex();
-
-    // Ensure currentIndex is within valid range
-    if (currentIndex >= 0 && currentIndex < slides.length) {
-      slides.forEach((slide, index) => {
-        if (index !== currentIndex) {
-          slide.style.transform = `translateY(${translateY}px)`;
-          slide.style.opacity = 0.5;
-        }
-      });
-
-      slides[currentIndex].style.transform = "translateY(0)";
-      slides[currentIndex].style.opacity = 1;
-    }
-
-    startY = currentY;
-
-    updateSlideOpacity();
-  });
-
-  container.addEventListener("mouseup", () => {
-    if (!isDDragging) return;
-
-    isDDragging = false;
-    stopSlide();
-    container.classList.remove("dragging");
-  });
-
-  container.addEventListener("mouseleave", () => {
-    if (!isDDragging) return;
-
-    isDDragging = false;
-    stopSlide();
-    container.classList.remove("dragging");
-  });
-
-  function stopSlide() {
-    const offSet = Math.round(translateY / slideHeight);
-    translateY = offSet * slideHeight;
-
-    if (offSet >= slides.length) {
-      translateY = 0;
-    } else if (offSet < 0) {
-      translateY = (slides.length - 1) * slideHeight;
-    }
-
-    container.style.transform = `translateY(${translateY}px)`;
-
-    updateSlideOpacity();
-  }
-
-  function updateSlideOpacity() {
-    const currentIndex = getCurrentSlideIndex();
-
-    // Ensure currentIndex is within valid range
-    if (currentIndex >= 0 && currentIndex < slides.length) {
-      slides.forEach((slide, index) => {
-        const offset = Math.abs(index - currentIndex);
-
-        if (offset === 0) {
-          slide.classList.add("center");
-          slide.style.opacity = 1;
-        } else {
-          slide.classList.remove("center");
-          slide.style.opacity = 0.5;
-        }
-      });
-    }
-  }
-
-  function getCurrentSlideIndex() {
-    return Math.floor(translateY / slideHeight);
-  }
+allChilds.forEach((item) => {
+  item.style.position = "absolute";
+  item.style.top = `${offset}px`;
 });
+
+allChilds[1].style.transform = "scale(1.2)";
+
+function arrangedList() {
+  allChilds.forEach((item, index) => {
+    // console.log(currIndex);
+
+    let correspondingIndex =
+      (index - currIndex + allChilds.length) % allChilds.length;
+    // console.log(correspondingIndex);
+
+    if (correspondingIndex === 0) {
+      item.style.transform = "scale(0.8)";
+      item.style.top = `${-offset}px`;
+      item.style.zIndex = 1;
+    } else if (correspondingIndex === 1) {
+      item.style.transform = "scale(1.2)";
+      item.style.top = `0px`;
+      item.style.zIndex = 2;
+    } else if (correspondingIndex === 2) {
+      item.style.transform = "scale(0.8)";
+      item.style.top = `${offset}px`;
+      item.style.zIndex = 1;
+    } else {
+      item.style.transform = "scale(0.8)";
+      item.style.top = `${offset * 2}px`;
+      item.style.zIndex = -1;
+    }
+  });
+}
+
+arrangedList();
+
+document.addEventListener("click", () => {
+  // allChilds.forEach((item) => {
+  //   if (item.getBoundingClientRect().top <= -300) {
+  //     item.style.zIndex = -1;
+  //     item.style.top = 300 + "px";
+  //   } else {
+  //     item.style.top = item.getBoundingClientRect().top - 300 + "px";
+  //     item.style.zIndex = 1;
+  //   }
+  // });
+  currIndex = (currIndex + 1) % allChilds.length;
+  arrangedList();
+});
+
+// allChilds[0].style.scale = 1.2;
+
+// let startPosition = 0;
+// let index = 0;
+// addEventListener("click", () => {
+// container.style.top = startPosition + "px";
+// startPosition -= 300;
+
+// for (let i = 0; i < allChilds.length; i++) {
+//   if (index === i) {
+//     allChilds[i].style.scale = 1.2;
+//   } else {
+//     allChilds[i].style.scale = 0.8;
+//   }
+// }
+
+// index++;
+
+// if (startPosition < -600) {
+//   startPosition = 0;
+//   index = 0;
+// }
+// });
